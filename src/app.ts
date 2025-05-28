@@ -1,16 +1,9 @@
-import express from 'express';
-import routes from './routes';
+import express from "express";
+import apiRoutes from "./routes/index";
 
 const app = express();
 
 app.use(express.json());
-
-// Base route
-app.get("/", (req, res) => {
-    res.send("API is running");
-});
-
-// API routes
-app.use('/api', routes);
+app.use("/api", apiRoutes);
 
 export default app;
