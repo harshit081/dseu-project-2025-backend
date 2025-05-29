@@ -91,7 +91,7 @@ import { sendEmail } from "../services/email";
 import generateOtp from "../services/OtpGenerator";
 
 
-const rollNumberExist = async (req: Request, res: Response) => {
+const rollNumberExist: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { rollNumber } = req.params;
 
@@ -111,23 +111,24 @@ const rollNumberExist = async (req: Request, res: Response) => {
           "@" + domain;
       }
 
-      return res.status(200).json({
+      res.status(200).json({
         exists: true,
         email: partialEmail,
       });
+      return;
     } else {
-      return res.status(404).json({ exists: false });
+      res.status(404).json({ exists: false });
     }
   } catch (error) {
     console.error("Error checking roll number:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: "Internal server error while checking roll number",
     });
   }
 };
 
-const verifyPartialEmail = async (req: Request, res: Response) => {
+const verifyPartialEmail: RequestHandler = async (req: Request, res: Response) => {
   try {
     const { rollNumber, email } = req.params;
 
@@ -137,7 +138,8 @@ const verifyPartialEmail = async (req: Request, res: Response) => {
       const expectedEmail = user.email;
 
       if (email !== expectedEmail) {
-        return res.status(400).json({ verified: false });
+        res.status(400).json({ verified: false });
+        return;
       }
 
       // Generate OTP
@@ -155,20 +157,20 @@ const verifyPartialEmail = async (req: Request, res: Response) => {
       );
 
       // Respond with success
-      return res.status(200).json({
+      res.status(200).json({
         verified: true,
         message: "OTP sent to your email for verification",
       });
     } else {
-      return res.status(400).json({ verified: false });
+      res.status(400).json({ verified: false });
     }
   } catch (error) {
     console.error("Error verifying partial email:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: "Internal server error while verifying partial email",
     });
   }
 };
 
-export { getUsers, rollNumberExist, verifyPartialEmail, login, setPassword, verifyOtp };
+export { rollNumberExist, verifyPartialEmail, login, setPassword, verifyOtp };
