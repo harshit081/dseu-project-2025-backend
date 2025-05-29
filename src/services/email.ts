@@ -2,7 +2,6 @@ import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { google } from "googleapis";
 import dotenv from "dotenv";
-import generateOtp from "./OtpGenerator";
 dotenv.config();
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;

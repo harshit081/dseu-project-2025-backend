@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   password: string;
+  otp?: string;
+  otpExpiresAt?: number;
 }
 
 export const dummyUsers: User[] = [
@@ -66,6 +68,12 @@ export const dummyUsers: User[] = [
     email: "pooja.agarwal@dseu.ac.in",
     password: "",
   },
+  {
+    rollNumber: "41522026",
+    name: "Harshit Tiwari",
+    email: "tharshit0812@gmail.com",
+    password: "",
+  }
 ];
 
 export default dummyUsers;
