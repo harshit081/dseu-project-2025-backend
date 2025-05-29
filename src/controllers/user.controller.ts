@@ -1,5 +1,33 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import dummyUsers from "../utils/dummyData";
+import jwt from "jsonwebtoken";
+// Login API: verifies rollNumber and password, returns JWT if valid
+const login: RequestHandler = async (req, res) => {
+  try {
+    const { rollNumber, password } = req.body;
+    if (!rollNumber || !password) {
+      res.status(400).json({ success: false, message: "rollNumber and password are required" });
+      return;
+    }
+    const user = dummyUsers.find(
+      (u) => u.rollNumber === rollNumber && u.password === password
+    );
+    if (!user) {
+      res.status(401).json({ success: false, message: "Invalid rollNumber or password" });
+      return;
+    }
+    // Create JWT
+    const token = jwt.sign(
+      { rollNumber: user.rollNumber, name: user.name, email: user.email },
+      process.env.JWT_SECRET || "supersecretkey",
+      { expiresIn: "1h" }
+    );
+    res.status(200).json({ success: true, token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
 import { sendEmail } from "../services/email";
 import generateOtp from "../services/OtpGenerator";
 
@@ -80,4 +108,4 @@ const verifyPartialEmail = async (req: Request, res: Response) => {
   }
 };
 
-export { getUsers, rollNumberExist, verifyPartialEmail };
+export { getUsers, rollNumberExist, verifyPartialEmail, login };

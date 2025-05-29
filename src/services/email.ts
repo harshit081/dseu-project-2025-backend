@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 import { google } from "googleapis";
 import dotenv from "dotenv";
 import generateOtp from "./OtpGenerator";
@@ -25,9 +26,11 @@ export const sendEmail = async (name: string, email: string, subject: string, me
         const { credentials } = await oAuth2Client.refreshAccessToken();
         const accessToken = credentials.access_token;
 
-
+//changed the email to use OAuth2 as smtp.gmail.com from gmail
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
             auth: {
                 type: 'OAuth2',
                 user: process.env.EMAIL,
@@ -39,7 +42,7 @@ export const sendEmail = async (name: string, email: string, subject: string, me
             tls: {
                 rejectUnauthorized: false
             }
-        });
+        } as SMTPTransport.Options);
 
         const info = await transporter.sendMail({
             from: `"DSEU " <${process.env.EMAIL}>`, // sender address
