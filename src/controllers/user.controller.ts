@@ -134,13 +134,13 @@ const rollNumberExist: RequestHandler = async (req: Request, res: Response) => {
           "@" +
           domain;
       }
+      const verified = !!user.password && user.password.trim() !== "";
       const data = {
         rollNumber: user.rollNumber,
         email: partialEmail,
-        // isVerified: isVerified,
         name: user.name,
+        verified,
       };
-      // console.log("Roll number exists:", data);
       res.status(200).json(data);
       return;
     } else {
