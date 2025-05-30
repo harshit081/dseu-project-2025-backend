@@ -120,11 +120,11 @@ const rollNumberExist: RequestHandler = async (req: Request, res: Response) => {
     const { rollNumber } = req.params;
 
     const user = dummyUsers.find((user) => user.rollNumber === rollNumber);
-
     if (user) {
       // Create partial email: if local part (before @) > 6, show first 2 and last 2 chars before @, mask the rest
       const email = user.email;
       const [local, domain] = email.split("@");
+      // const isVerified = user.isVerified;
       let partialEmail = email;
       if (local.length > 6) {
         partialEmail =
@@ -134,17 +134,20 @@ const rollNumberExist: RequestHandler = async (req: Request, res: Response) => {
           "@" +
           domain;
       }
-
-      res.status(200).json({
-        exists: true,
+      const data = {
+        rollNumber: user.rollNumber,
         email: partialEmail,
-      });
+        // isVerified: isVerified,
+        name: user.name,
+      };
+      // console.log("Roll number exists:", data);
+      res.status(200).json(data);
       return;
     } else {
-      res.status(404).json({ exists: false });
+      res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    console.error("Error checking roll number:", error);
+    // console.error("Error checking roll number:", error);
     res.status(500).json({
       success: false,
       error: "Internal server error while checking roll number",
@@ -158,9 +161,9 @@ const verifyPartialEmail: RequestHandler = async (
 ) => {
   try {
     const { rollNumber, email } = req.params;
-
+    console.log("Verifying email for roll number:", rollNumber, "with email:", email);
     const user = dummyUsers.find((user) => user.rollNumber === rollNumber);
-
+    console.log(user);
     if (user) {
       const expectedEmail = user.email;
 
