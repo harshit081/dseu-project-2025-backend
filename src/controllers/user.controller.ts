@@ -1,3 +1,41 @@
+// --- CAPTCHA DEMO ---
+import { CaptchaJs } from "@solarwinter/captchajs";
+let captchaStore: { [key: string]: string } = {};
+
+// Route handler to generate a CAPTCHA
+const generateCaptcha: RequestHandler = (req, res) => {
+  const captcha = new CaptchaJs({ client: "demo", secret: "secret" });
+  const randomString = captcha.getRandomString();
+  const image = captcha.getImageUrl({ randomString });
+  // Generate a random ID to associate with this captcha
+  const captchaId = Math.random().toString(36).substring(2, 15);
+  captchaStore[captchaId] = randomString;
+  // Return the image (base64 or url) and the id to the frontend
+  res.json({ captchaId, image });
+};
+
+// Route handler to verify a CAPTCHA
+const verifyCaptcha: RequestHandler = (req, res) => {
+  const { captchaId, answer } = req.body;
+  if (!captchaId || !answer) {
+    res.status(400).json({ success: false, message: "captchaId and answer are required" });
+    return;
+  }
+  const expected = captchaStore[captchaId];
+  if (!expected) {
+    res.status(400).json({ success: false, message: "Captcha expired or not found" });
+    return;
+  }
+  // Use CaptchaJs to verify the answer
+  const captcha = new CaptchaJs({ client: "demo", secret: "secret" });
+  const isValid = captcha.verifyPassword(expected, answer);
+  if (isValid) {
+    delete captchaStore[captchaId];
+    res.json({ success: true, message: "Captcha verified successfully" });
+  } else {
+    res.status(400).json({ success: false, message: "Invalid captcha answer" });
+  }
+};
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import dummyUsers from "../utils/dummyData";
 import jwt from "jsonwebtoken";
@@ -139,7 +177,7 @@ const rollNumberExist: RequestHandler = async (req: Request, res: Response) => {
         rollNumber: user.rollNumber,
         email: partialEmail,
         name: user.name,
-        verified,
+        isVerified: verified,
       };
       res.status(200).json(data);
       return;
@@ -203,4 +241,4 @@ const verifyPartialEmail: RequestHandler = async (
   }
 };
 
-export { rollNumberExist, verifyPartialEmail, login, setPassword, verifyOtp };
+export { rollNumberExist, verifyPartialEmail, login, setPassword, verifyOtp, generateCaptcha, verifyCaptcha };

@@ -19,6 +19,12 @@ export const dummyUsers: User[] = [
     name: "Harshit Tiwari",
     email: "tharshit0812@gmail.com",
     password: "",
+  },
+  {
+    rollNumber: "41422046",
+    name: "Sagar Kumar Pathak",
+    email: "sagar200407@gmail.com",
+    password: "",
   }
 ];
 
